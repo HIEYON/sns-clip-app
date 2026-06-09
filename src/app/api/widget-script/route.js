@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // 카페24 쇼핑몰에 삽입되는 위젯 스크립트
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

@@ -1,13 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function getClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
-// 스토어 저장/업데이트
 export async function upsertStore({ mall_id, access_token, refresh_token, expires_at }) {
-  const { data, error } = await supabase
+  const { data, error } = await getClient()
     .from('stores')
     .upsert({ mall_id, access_token, refresh_token, expires_at }, { onConflict: 'mall_id' })
     .select()
@@ -16,9 +17,8 @@ export async function upsertStore({ mall_id, access_token, refresh_token, expire
   return data;
 }
 
-// 스토어 조회
 export async function getStore(mall_id) {
-  const { data, error } = await supabase
+  const { data, error } = await getClient()
     .from('stores')
     .select('*')
     .eq('mall_id', mall_id)
@@ -27,17 +27,15 @@ export async function getStore(mall_id) {
   return data;
 }
 
-// 스크립트태그 번호 저장
 export async function saveScriptTagNo(mall_id, script_tag_no) {
-  await supabase
+  await getClient()
     .from('stores')
     .update({ script_tag_no })
     .eq('mall_id', mall_id);
 }
 
-// 영상 목록 조회
 export async function getVideos(mall_id) {
-  const { data, error } = await supabase
+  const { data, error } = await getClient()
     .from('videos')
     .select('*')
     .eq('mall_id', mall_id)
@@ -47,9 +45,8 @@ export async function getVideos(mall_id) {
   return data || [];
 }
 
-// 영상 추가
 export async function addVideo(mall_id, video) {
-  const { data, error } = await supabase
+  const { data, error } = await getClient()
     .from('videos')
     .insert({ mall_id, ...video })
     .select()
@@ -58,21 +55,10 @@ export async function addVideo(mall_id, video) {
   return data;
 }
 
-// 영상 삭제
 export async function deleteVideo(id, mall_id) {
-  const { error } = await supabase
+  const { error } = await getClient()
     .from('videos')
     .delete()
-    .eq('id', id)
-    .eq('mall_id', mall_id);
-  if (error) throw error;
-}
-
-// 영상 순서 업데이트
-export async function updateVideoOrder(id, mall_id, sort_order) {
-  const { error } = await supabase
-    .from('videos')
-    .update({ sort_order })
     .eq('id', id)
     .eq('mall_id', mall_id);
   if (error) throw error;

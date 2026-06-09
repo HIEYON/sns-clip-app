@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 import { getVideos, addVideo, deleteVideo } from '@/lib/supabase';
 
-function getMallId(request) {
-  const cookieStore = cookies();
+async function getMallId(request) {
+  const cookieStore = await cookies();
   let mallId = cookieStore.get('mall_id')?.value;
   if (!mallId) {
     const { searchParams } = new URL(request.url);
@@ -12,7 +12,7 @@ function getMallId(request) {
 }
 
 export async function GET(request) {
-  const mallId = getMallId(request);
+  const mallId = await getMallId(request);
   if (!mallId) return Response.json({ error: '인증 필요' }, { status: 401 });
 
   const videos = await getVideos(mallId);
@@ -20,7 +20,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const mallId = getMallId(request);
+  const mallId = await getMallId(request);
   if (!mallId) return Response.json({ error: '인증 필요' }, { status: 401 });
 
   const body = await request.json();
@@ -33,7 +33,7 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
-  const mallId = getMallId(request);
+  const mallId = await getMallId(request);
   if (!mallId) return Response.json({ error: '인증 필요' }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
